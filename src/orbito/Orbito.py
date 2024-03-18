@@ -1,11 +1,7 @@
-# Création d'une liste de listes 4x4 remplie de zéros
-
-
 def init_game() :
     """ Initialisation du plateau"""
     L = [[0 for _ in range(4)] for _ in range(4)]
     return L
-
 
 def print_board_term(board) : 
     """ Affichage graphique du plateau """
@@ -36,8 +32,6 @@ def print_board_term(board) :
                 elif L[d][q] == 1 : L[d][q] =" B "
                 elif L[d][q] == 2 : L[d][q] =" N "
 
-# Quels sont les mouvements possibles
-
 def available_moves(board):
     """ Liste des mouvements possibles"""
     mon_set = set()
@@ -48,8 +42,6 @@ def available_moves(board):
             else:pass
     return sorted(mon_set)
 
-
-# Est-ce que le mouvement est valide 
 def is_valid_move(color, pose_row, pose_col, board):
     """ Détermine si le mouvement est possible ou non """
     if color=="Blanc" and board[pose_row][pose_col]==0:
@@ -64,7 +56,6 @@ def is_valid_move(color, pose_row, pose_col, board):
             return False
     else:
         return False
-
 
 import re
 def ask_player_mouv(color,board):
@@ -103,8 +94,6 @@ def ask_player_mouv(color,board):
                     else:
                         return(tuple(mouv))
 
-# Mouvement effectué
-
 def move(color, board):
     """ effectue le mouvement de la bille """
     mouv = ask_player_mouv(color,board)
@@ -117,7 +106,6 @@ def move(color, board):
             elif color=="Noir":
                 board[mouv[0]][mouv[1]] = 2 
         return board
-
 
 def is_oponent_ball(color,board,pose_row,pose_col):
     """ Vérifie que c'est une bille adverse """
@@ -159,9 +147,7 @@ def is_valid_oponent_ball_move(color, pose_row, pose_col, ball_row, ball_col, bo
     else:
         return False
 
-
 import re
-
 def ask_move_oponent_ball(color, board):
     """ Demande le mouvement à effectuer sur la bille adverse """
     while True:
@@ -213,7 +199,6 @@ def move_opponent_ball(color, board):
         board[coord[0]][coord[1]] = 0
     return board
 
-
 def push_button(board):
     """ Fait orbiter les billes du plateau """
     new_board = [[0 for _ in range(4)] for _ in range(4)]
@@ -234,7 +219,6 @@ def push_button(board):
     board = new_board
     return board
 
-
 def all_colour_balls(color,board):
     """ Récupère la position de toutes les billes d'un couleur sur le plateau """
     if color=="Blanc":
@@ -250,7 +234,6 @@ def all_colour_balls(color,board):
                 if board[row][col]==2:
                     mon_set.add((row,col))
     return mon_set
-
 
 def is_winned(color, board):
     """ Vérifie si un joueur à gagné """
