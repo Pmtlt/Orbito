@@ -399,4 +399,3 @@ def game():
                 # Plateau non complet
                 else:
                     tour += 1
-game()
