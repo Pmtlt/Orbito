@@ -1,401 +1,337 @@
-def init_game() :
-    """ Initialisation du plateau"""
-    L = [[0 for _ in range(4)] for _ in range(4)]
-    return L
-
-def print_board_term(board) : 
-    """ Affichage graphique du plateau """
-    L = [row[:] for row in board]
-    a = "+"
-    b = "-"
-    c = "|"
-    col = "     0   1   2   3  "
-    for d in range(4) : 
-        for q in range(4):
-            if L[d][q] == 0 : L[d][q] = "   "
-            elif L[d][q] == 1 : L[d][q] =" B "
-            elif L[d][q] == 2 : L[d][q] =" N "
-    print(col)
-    print ("   " + (a+b*3)*4 + a)
-    y=0
-    while y<4 :
-        z = str(y)
-        print (z + "  ", end="")
-        for i in range(4):
-            print(c + str(L[y][i]),end="")
-        print(c)
-        print ("   " + (a+b*3)*4 + a, end="\n")
-        y = y + 1
-    for d in range(4) : 
-            for q in range(4):
-                if L[d][q] == 0 : L[d][q] = "   "
-                elif L[d][q] == 1 : L[d][q] =" B "
-                elif L[d][q] == 2 : L[d][q] =" N "
-
-def available_moves(board):
-    """ Liste des mouvements possibles"""
-    mon_set = set()
-    for row in range(0,len(board)):
-        for col in range(0,len(board)):
-            if board[row][col] == 0:
-                mon_set.add((row,col))
-            else:pass
-    return sorted(mon_set)
-
-def is_valid_move(color, pose_row, pose_col, board):
-    """ Détermine si le mouvement est possible ou non """
-    if color=="Blanc" and board[pose_row][pose_col]==0:
-        if (pose_row, pose_col) in available_moves(board):
-            return True
-        else: 
-            return False
-    if color=="Noir" and board[pose_row][pose_col]==0:
-        if (pose_row, pose_col) in available_moves(board):
-            return True
-        else:
-            return False
-    else:
-        return False
-
-import re
-def ask_player_mouv(color,board):
-    """ Demande au joueur ou il veut poser la bille """
-    error = 1
-    while error==1 : 
-        error = 0
-        mouv=input(f"C'est au tour du joueur {color}, où voulez vous poser votre bille ? :\n")
-        print("---"*25)
-        regex = "[A-Za-z]"
-        x = re.search(regex, mouv)
-        if x != None :
-            print("ERREUR : Vous devez écrire 2 entiers séparés par des espaces")
-            print("---"*25)
-            error = 1     
-        else :
-            mouv = mouv.split()
-            for j in range(len(mouv)) :
-                mouv[j] = int(mouv[j])
-            if len(mouv) != 2:
-                print("ERREUR : Vous devez écrire 2 entiers séparés par des espaces")
-                print("---"*25)
-                error = 1
-            else : 
-                for chiffres in range(len(mouv)) :
-                    if mouv[chiffres] < 0 or mouv[chiffres] > 3 :
-                        print("ERREUR : Ces coordonées sont en dehors du plateau !")
-                        print("---"*25)
-                        error = 1
-                        break
-                if error == 0 :
-                    if is_valid_move(color, mouv[0], mouv[1], board)==False :
-                        print("ERREUR : Le mouvement doit être possible")
-                        print("---"*25)
-                        error = 1
-                    else:
-                        return(tuple(mouv))
-
-def move(color, board):
-    """ effectue le mouvement de la bille """
-    mouv = ask_player_mouv(color,board)
-    if mouv:
-        if mouv is None:
-            raise ValueError()
-        else:
-            if color=="Blanc":
-                board[mouv[0]][mouv[1]] = 1
-            elif color=="Noir":
-                board[mouv[0]][mouv[1]] = 2 
-        return board
-
-def is_oponent_ball(color,board,pose_row,pose_col):
-    """ Vérifie que c'est une bille adverse """
-    if color == "Blanc" and board[pose_row][pose_col]==1:
-        print("---"*25)
-        print("ERREUR : C'est une de vos billes !")
-        print("---"*25)
-        return False
-    elif color == "Noir" and board[pose_row][pose_col]==2:
-        print("---"*25)
-        print("ERREUR : C'est une de vos billes !")
-        print("---"*25)
-        return False
-    elif board[pose_row][pose_col]==0:
-        print("---"*25)
-        print("ERREUR : C'est une case vide !")
-        print("---"*25)
-        return False
-    else:
-        return True
-
-def check_moves_oponent_ball(color, board, pose_row, pose_col):
-    """ Vérifie quels déplacement sont possibles pour la bille adverse """
-    mon_set = set()
-    if 0 <= pose_col + 1 <= 3 and board[pose_row][pose_col + 1] == 0:
-        mon_set.add((pose_row, pose_col + 1))
-    if 0 <= pose_col - 1 <= 3 and board[pose_row][pose_col - 1] == 0:
-        mon_set.add((pose_row, pose_col - 1))
-    if 0 <= pose_row + 1 <= 3 and board[pose_row + 1][pose_col] == 0:
-        mon_set.add((pose_row + 1, pose_col))
-    if 0 <= pose_row - 1 <= 3 and board[pose_row - 1][pose_col] == 0:
-        mon_set.add((pose_row - 1, pose_col))
-    return mon_set
-
-def is_valid_oponent_ball_move(color, pose_row, pose_col, ball_row, ball_col, board):
-    """ Vérifie que le mouvement de la bille adverse est valide """
-    if color == "Blanc" or color == "Noir":
-        return (pose_row, pose_col) in check_moves_oponent_ball(color, board, ball_row, ball_col)
-    else:
-        return False
-
-import re
-def ask_move_oponent_ball(color, board):
-    """ Demande le mouvement à effectuer sur la bille adverse """
-    while True:
-        ask = input(f"Joueur {color} voulez-vous bouger une bille adverse ? :\n")
-        print("---"*25)
-        if re.search(r'Oui', ask, re.IGNORECASE):
-            coord = input("Quelle bille voulez vous bouger ? :\n")
-            print("---"*25)
-            regex = re.search(r'[A-Za-z]', coord)
-            if regex is not None:
-                print("ERREUR : Vous devez écrire 2 entiers séparés par des espaces")
-                print("---"*25)
-                continue
-            coord = coord.split()
-            coord = [int(x) for x in coord]
-            if len(coord) != 2 or any(x < 0 or x > 3 for x in coord):
-                print("ERREUR : Les coordonnées doivent être sur le plateau")
-                print("---"*25)
-                continue
-            if not is_oponent_ball(color, board, coord[0], coord[1]):
-                print("ERREUR : Aucune bille adverse à cet endroit")
-                print("---"*25)
-                continue
-            mouv = input("Où est ce que vous voulez bouger cette bille adverse ? :\n")
-            print("---"*25)
-            mouv = mouv.split()
-            mouv = [int(x) for x in mouv]
-            if len(mouv) != 2 or any(x < 0 or x > 3 for x in mouv):
-                print("ERREUR : Les coordonnées doivent être sur le plateau")
-                print("---"*25)
-                continue
-            if not is_valid_oponent_ball_move(color, mouv[0], mouv[1], coord[0], coord[1], board):
-                print("ERREUR : Le mouvement n'est pas possible")
-                print("---"*25)
-                continue
-            return tuple(mouv), tuple(coord)
-        elif re.search(r'Non', ask, re.IGNORECASE):
-            return None
-        else:
-            print("ERREUR : Veuillez répondre par 'Oui' ou par 'Non'")
-            print("---"*25)
-
-def move_opponent_ball(color, board):
-    """ Déplace la bille adverse """
-    result = ask_move_oponent_ball(color, board)
-    if result is not None:
-        mouv, coord = result
-        board[mouv[0]][mouv[1]] = board[coord[0]][coord[1]]
-        board[coord[0]][coord[1]] = 0
-    return board
-
-def push_button(board):
-    """ Fait orbiter les billes du plateau """
-    new_board = [[0 for _ in range(4)] for _ in range(4)]
-    col_minus_one = [(0,3),(0,1),(0,2),(1,2)]
-    col_plus_one = [(3,0),(3,1),(3,2),(2,1)]
-    row_minus_one = [(3,3),(2,3),(1,3),(2,2)]
-    row_plus_one = [(0,0),(1,0),(2,0),(1,1)]
-    for row in range(0,len(new_board)):
-        for col in range(0,len(new_board)):
-            if (row,col) in col_minus_one :
-                new_board[row][col-1] = board[row][col]
-            elif (row,col) in col_plus_one :
-                new_board[row][col+1] = board[row][col]
-            elif (row,col) in row_plus_one :
-                new_board[row+1][col] = board[row][col]
-            elif (row,col) in row_minus_one :
-                new_board[row-1][col] = board[row][col]
-    board = new_board
-    return board
-
-def all_colour_balls(color,board):
-    """ Récupère la position de toutes les billes d'un couleur sur le plateau """
-    if color=="Blanc":
-        mon_set = set()
-        for row in range(0,len(board)):
-            for col in range(0,len(board)):
-                if board[row][col]==1:
-                    mon_set.add((row,col))
-    if color=="Noir":
-        mon_set = set()
-        for row in range(0,len(board)):
-            for col in range(0,len(board)):
-                if board[row][col]==2:
-                    mon_set.add((row,col))
-    return mon_set
-
-def is_winned(color, board):
-    """ Vérifie si un joueur à gagné """
-    all_winning_conditions = [[(0,0),(1,1),(2,2),(3,3)],
-                              [(0,3),(1,2),(2,1),(3,0)],
-                              [(0,0),(1,0),(2,0),(3,0)],
-                              [(0,1),(1,1),(2,1),(3,1)],
-                              [(0,2),(1,2),(2,2),(3,2)],
-                              [(0,3),(1,3),(2,3),(3,3)],
-                              [(0,0),(0,1),(0,2),(0,3)],
-                              [(1,0),(1,1),(1,2),(1,3)],
-                              [(2,0),(2,1),(2,2),(2,3)],
-                              [(3,0),(3,1),(3,2),(3,3)]]
-    all_balls = all_colour_balls(color, board)
-    for condition in all_winning_conditions:
-        count = 0
-        for pos in condition:
-            if pos in all_balls:
-                count += 1
-            else:
-                break
-        if count == 4:
-            return True
-    return False
-
-import re
-import time
-def rules():
-    """ Affichage des règles """
-    rules = ["Règles du jeu :\n", 
-             "Votre but sera d'aligner 4 billes de votre couleur que ce soit horizontalement, verticalement ou diagonalement\n",
-             "Les blancs commencent en premier et pour savoir qui jouera les un lancement de dé sera fait,\ncelui qui a le plus grand chiffre joue les blancs\n",
-             "Chaque tour se jour en trois étapes :\n",
-             "Etape n°1 (Cette étape ne peut être faite qu'à partir du 2ème tour de chaque joueur !) :\n",
-             "Vous pouvez choisir de déplacer une bille adverse :\n",
-             "  - ce déplacement ne se fait que dans une case adjacente de la bille sauf en diagonale !\n",
-             "Etape n°2 : Placez une de vos billes sur une case vide du plateau\n",
-             "Attention, une fois cette bille placée, elle ne peut plus être déplacée sauf par votre adversaire !\n",
-             "Etape n°3 : Actionnement du bouton, les billes orbitent !\n",
-             "Après orbitage, si quatres billes sont alignées pour vous ou votre adversaire, la partie s'arrête et celui qui à aligné quatre billes gagne\n",
-             "Sinon la partie continue !\n"]
-    print("---"*25)
-    ask = input("Voulez vous lire les règles du jeu ?\n")
-    print("---"*25)
-    if re.search(r'oui',ask,re.IGNORECASE):
-        for elmt in rules:
-            print(elmt)
-            time.sleep(2)
-        print("---"*25)
-    elif re.search(r'non',ask,re.IGNORECASE):
-        pass
-    else:
-        print("ERREUR : Veuillez répondre par oui ou pas non !")
-
+import tkinter as tk
+from tkinter import messagebox
 import random
-import time
-def dice_throw():
-    """ Lancé de dé """
-    error = 1
-    while error == 1:
-        print("Lancé de dé pour le joueur un !\n")
-        nombre_j_un = random.randrange(0,6,1)
-        time.sleep(1)
-        print(f"Joueur n°1 vous avez fait {nombre_j_un}\n")
-        print("---"*25)
-        time.sleep(1)
-        print("Lancé de dé pour le joueur deux !\n")
-        nombre_j_deux = random.randrange(0,6,1)
-        time.sleep(1)
-        print(f"Joueur n°2 vous avez fait {nombre_j_deux}\n")
-        print("---"*25)
-        if nombre_j_un > nombre_j_deux :
-            time.sleep(1)
-            print("Joueur n°1 vous serez les billes blanches !\n")
-            error = 0
-            break
-        if nombre_j_deux > nombre_j_un :
-            time.sleep(1)
-            print("Joueur n°2 vous serez les billes blanches !\n")
-            error = 0
-            break
-        else:
-            time.sleep(1)
-            print("Vous avez tiré le même nombre recommençons !\n")
 
-import time
-def game():
-    """ Fonction de lancement d'une partie """
-    # Enoncement des règles
-    rules()
-    # Détermination du joueur blanc
-    dice_throw()
-    print("---"*25)
-    # Initialisation du plateau de jeu
-    board = init_game() 
-    color = ["Blanc", "Noir"]
-    tour = 0
-    win_white = 0
-    win_black = 0
-    # Boucle principale de la partie
-    while win_white == 0 and win_black == 0:
-        for i in range(len(color)):
-            # Affichage du plateau
-            print_board_term(board)
-            print("---"*25)
-            time.sleep(0.5)
-            # Déplacement d'une bille adverse si tour > 2
-            if tour < 2 :
-                pass
-            else :
-                board = move_opponent_ball(color[i], board)
-                time.sleep(0.5)
-                # Affichage du plateau
-                print_board_term(board)
-                print("---"*25)
-            # Placement d'une bille sur le plateau de jeu 
-            board = move(color[i], board)
-            time.sleep(0.5)
-            # Affichage du plateau
-            print_board_term(board)
-            print("---"*25)
-            time.sleep(0.5)
-            # Orbitement des billes sur le plateau
-            board = push_button(board)
-            print("Actionnement du bouton !")
-            print("---"*25)
-            time.sleep(0.5)
-            # Checking des condition de victorie
-            for j in range(len(color)):
-                if is_winned(color[j], board):
-                    if color[j] == "Blanc":
-                        win_white += 1
-                    else:
-                        win_black += 1
-            # Match nul
-            if win_white > 0 and win_black > 0:
-                print("C'est un match nul ! Bravo aux deux joueurs.")
-                print_board_term(board)
-                break
-            # Victoire blanche
-            elif win_white > 0 and win_black <= 0:
-                print("Bravo au joueur Blanc ! Vous avez aligné 4 billes !" )
-                print_board_term(board)
-                break
-            # Victoire noire
-            elif win_white <= 0 and win_black > 0:
-                print("Bravo au joueur Noir ! Vous avez aligné 4 billes !" )
-                print_board_term(board)
-                break
-            # Acune victoire
-            elif win_white <= 0 and win_black <= 0:
-                count = 0
-                for row in range(len(board)):
-                    for col in range(len(board)):
-                        if board[row][col] == 0:
-                            break
-                        else:
-                            count += 1
-                # Plateau complet
-                if count == 16 :
-                    print("Toutes les cases sont remplies et personne n'a aligné 4 billes ! Aucun gagnant pour cette partie !")
-                    exit()
-                # Plateau non complet
+class OrbitGame:
+    """Main class for the Orbit game implementing both GUI and game logic.
+
+    This class manages all aspects of the Orbit game, including:
+    - Tkinter graphical interface
+    - 4x4 game board
+    - Ball placement logic
+    - Rotation (orbit) system
+    - Win condition checking
+    
+    Attributes:
+        window (tk.Tk): Main game window
+        board (list): 4x4 matrix representing game state (0: empty, 1: white, 2: black)
+        current_player (int): Current player (1: white, 2: black)
+        move_made (bool): Indicates if a move has been made this turn
+        CELL_SIZE (int): Size in pixels of each cell
+        CIRCLE_PADDING (int): Spacing between ball and cell border
+        BOARD_COLOR (str): Board color code
+        EMPTY_COLOR (str): Empty cell color code
+        WHITE_PIECE (str): White ball color code
+        BLACK_PIECE (str): Black ball color code
+        HIGHLIGHT (str): Hover highlight color code
+    """
+    
+    def __init__(self):
+        self.window = tk.Tk()
+        self.window.title("Jeu Orbit")
+        self.window.configure(bg='#8B4513')
+        
+        self.board = [[0 for _ in range(4)] for _ in range(4)]
+        self.current_player = 1
+        self.canvases = []
+        self.circles = []
+        self.move_made = False
+        
+        self.main_frame = tk.Frame(self.window, bg='#DEB887', bd=15, relief='ridge')
+        self.main_frame.pack(padx=20, pady=20)
+        
+        self.CELL_SIZE = 90
+        self.CIRCLE_PADDING = 8
+        self.SHADOW_OFFSET = 2
+        
+        self.BOARD_COLOR = '#8B4513'
+        self.EMPTY_COLOR = '#6B4423'
+        self.WHITE_PIECE = '#FFFAFA'
+        self.BLACK_PIECE = '#0C0C0C'
+        self.HIGHLIGHT = '#CD853F'
+        
+        self.create_board()
+        self.create_controls()
+        
+        self.player_label = tk.Label(self.main_frame, text="Tour du joueur Blanc",
+                                   font=('Arial', 14, 'bold'), bg='#DEB887', fg='#4A3210')
+        self.player_label.grid(row=5, column=0, columnspan=4, pady=15)
+        
+    def create_board(self):
+        """Initialize the game board with a 4x4 grid of cells.
+        
+        Creates a visual 4x4 grid where each cell is a tkinter canvas.
+        Each cell contains:
+        - A background with wood grain effect
+        - A recessed area for the ball
+        - A circle for the ball
+        - A shine effect
+        
+        The method also configures click and hover events for each cell.
+        
+        Cells are stored in self.canvases and balls in self.circles for
+        later manipulation.
+        """
+        grid_frame = tk.Frame(self.main_frame, bg='#A0522D', bd=8, relief='raised')
+        grid_frame.grid(row=0, column=0, rowspan=4, columnspan=4, padx=10, pady=10)
+        
+        for i in range(4):
+            canvas_row = []
+            circle_row = []
+            for j in range(4):
+                canvas = tk.Canvas(grid_frame, width=self.CELL_SIZE, 
+                                 height=self.CELL_SIZE, bg=self.BOARD_COLOR,
+                                 highlightthickness=1, highlightbackground='#6B4423')
+                canvas.grid(row=i, column=j, padx=3, pady=3)
+                
+                for k in range(0, self.CELL_SIZE, 8):
+                    canvas.create_line(0, k, self.CELL_SIZE, k,
+                                    fill='#966F33', width=1, stipple='gray50')
+                
+                canvas.create_oval(self.CIRCLE_PADDING - 2, self.CIRCLE_PADDING - 2,
+                                 self.CELL_SIZE - self.CIRCLE_PADDING + 2,
+                                 self.CELL_SIZE - self.CIRCLE_PADDING + 2,
+                                 fill=self.EMPTY_COLOR, outline='#4A3210')
+                
+                circle = canvas.create_oval(self.CIRCLE_PADDING, self.CIRCLE_PADDING,
+                                         self.CELL_SIZE - self.CIRCLE_PADDING,
+                                         self.CELL_SIZE - self.CIRCLE_PADDING,
+                                         fill=self.EMPTY_COLOR, outline='')
+                
+                highlight_size = self.CIRCLE_PADDING + 10
+                canvas.create_oval(highlight_size, highlight_size,
+                                 highlight_size + 15, highlight_size + 15,
+                                 fill='white', stipple='gray50', outline='')
+                
+                canvas.bind('<Button-1>', lambda e, r=i, c=j: self.make_move(r, c))
+                canvas.bind('<Enter>', lambda e, c=canvas: self.on_enter(c))
+                canvas.bind('<Leave>', lambda e, c=canvas: self.on_leave(c))
+                
+                canvas_row.append(canvas)
+                circle_row.append(circle)
+            self.canvases.append(canvas_row)
+            self.circles.append(circle_row)
+    
+    def create_controls(self):
+        """Create game control buttons.
+        
+        Sets up two buttons:
+        - "Orbit": For rotating the balls (disabled by default)
+        - "New Game": For resetting the game
+        
+        Buttons are styled with a wooden look consistent with the game theme.
+        """
+        button_frame = tk.Frame(self.main_frame, bg='#DEB887')
+        button_frame.grid(row=4, column=0, columnspan=4, pady=15)
+        
+        button_style = {'font': ('Arial', 12, 'bold'), 
+                       'bg': '#8B4513', 
+                       'fg': '#FFE4B5',
+                       'activebackground': '#A0522D', 
+                       'activeforeground': '#FFE4B5',
+                       'width': 15, 
+                       'height': 1, 
+                       'bd': 4, 
+                       'relief': 'raised'}
+        
+        self.orbit_button = tk.Button(button_frame, text="Orbite",
+                                    command=self.orbit_move, state='disabled',
+                                    **button_style)
+        self.orbit_button.pack(side=tk.LEFT, padx=10)
+        
+        new_game_button = tk.Button(button_frame, text="Nouvelle Partie",
+                                  command=self.new_game, **button_style)
+        new_game_button.pack(side=tk.LEFT, padx=10)
+    
+    def on_enter(self, canvas):
+        """Handle cell hover effect.
+        
+        Args:
+            canvas (tk.Canvas): The canvas being hovered over
+            
+        Empty cells change color on hover to indicate they are clickable.
+        """
+        if canvas['bg'] == self.BOARD_COLOR:
+            canvas['bg'] = self.HIGHLIGHT
+    
+    def on_leave(self, canvas):
+        """Handle end of cell hover.
+        
+        Args:
+            canvas (tk.Canvas): The canvas no longer being hovered over
+            
+        Restores the cell's original color.
+        """
+        if canvas['bg'] == self.HIGHLIGHT:
+            canvas['bg'] = self.BOARD_COLOR
+    
+    def add_shine_effect(self, canvas, circle, color):
+        """Add a shine effect to a ball.
+        
+        Args:
+            canvas (tk.Canvas): The canvas containing the ball
+            circle (int): The ID of the circle representing the ball
+            color (str): The color code to apply to the ball
+            
+        Applies the specified color to the ball and adds a shine effect
+        by overlaying a small semi-transparent white circle.
+        """
+        canvas.itemconfig(circle, fill=color)
+        highlight_size = self.CIRCLE_PADDING + 10
+        canvas.create_oval(highlight_size, highlight_size,
+                         highlight_size + 15, highlight_size + 15,
+                         fill='white', stipple='gray50', outline='')
+    
+    def make_move(self, row, col):
+        """Place a ball on the board.
+        
+        Args:
+            row (int): Row index (0-3)
+            col (int): Column index (0-3)
+            
+        If the move is valid (empty cell and no move made this turn),
+        places a ball of the current player's color and enables the
+        orbit button.
+        """
+        if not self.move_made and self.board[row][col] == 0:
+            self.board[row][col] = self.current_player
+            color = self.WHITE_PIECE if self.current_player == 1 else self.BLACK_PIECE
+            canvas = self.canvases[row][col]
+            circle = self.circles[row][col]
+            self.add_shine_effect(canvas, circle, color)
+            self.move_made = True
+            self.orbit_button['state'] = 'normal'
+    
+    def update_display(self):
+        """Update the board display after a move.
+        
+        Iterates through the board and updates the appearance of each cell
+        based on its content (empty, white ball, or black ball).
+        Visual effects (shine, etc.) are reapplied.
+        """
+        for i in range(4):
+            for j in range(4):
+                canvas = self.canvases[i][j]
+                circle = self.circles[i][j]
+                if self.board[i][j] == 0:
+                    canvas.itemconfig(circle, fill=self.EMPTY_COLOR)
+                elif self.board[i][j] == 1:
+                    self.add_shine_effect(canvas, circle, self.WHITE_PIECE)
                 else:
-                    tour += 1
+                    self.add_shine_effect(canvas, circle, self.BLACK_PIECE)
+
+    def orbit_move(self):
+        """Execute the ball rotation move.
+        
+        Makes balls "orbit" according to a predefined pattern:
+        - External balls rotate clockwise
+        - Internal balls rotate counterclockwise
+        
+        After rotation, checks if either player (or both) has won.
+        If so, displays appropriate message and resets the game.
+        If not, moves to next player's turn.
+        """
+        if not self.move_made:
+            return
+            
+        new_board = [[0 for _ in range(4)] for _ in range(4)]
+        
+        moves = {
+            (0,0): (1,0), (1,0): (2,0), (2,0): (3,0),
+            (3,0): (3,1), (3,1): (3,2), (3,2): (3,3),
+            (3,3): (2,3), (2,3): (1,3), (1,3): (0,3),
+            (0,3): (0,2), (0,2): (0,1), (0,1): (0,0),
+            (1,1): (2,1), (2,1): (2,2), (2,2): (1,2),
+            (1,2): (1,1)
+        }
+        
+        for (old_row, old_col), (new_row, new_col) in moves.items():
+            new_board[new_row][new_col] = self.board[old_row][old_col]
+        
+        self.board = new_board
+        self.update_display()
+        
+        white_wins = self.check_win_for_player(1)
+        black_wins = self.check_win_for_player(2)
+        
+        if white_wins and black_wins:
+            messagebox.showinfo("Match Nul", "Les deux joueurs ont gagné !")
+            self.new_game()
+        elif white_wins:
+            messagebox.showinfo("Victoire", "Le joueur Blanc a gagné!")
+            self.new_game()
+        elif black_wins:
+            messagebox.showinfo("Victoire", "Le joueur Noir a gagné!")
+            self.new_game()
+        else:
+            self.current_player = 3 - self.current_player
+            self.player_label.config(
+                text=f"Tour du joueur {'Blanc' if self.current_player == 1 else 'Noir'}")
+            self.move_made = False
+            self.orbit_button['state'] = 'disabled'
+    
+    def check_win_for_player(self, player):
+        """Check if a player has won.
+        
+        Args:
+            player (int): Player identifier (1 for White, 2 for Black)
+            
+        Returns:
+            bool: True if the player has aligned 4 balls (horizontally,
+                 vertically, or diagonally), False otherwise
+        
+        Checks all possible winning conditions:
+        - 4 horizontal lines
+        - 4 vertical lines
+        - 2 diagonals
+        """
+        winning_conditions = [
+            [(i,j) for j in range(4)] for i in range(4)
+        ] + [
+            [(j,i) for j in range(4)] for i in range(4)
+        ] + [
+            [(i,i) for i in range(4)],
+            [(i,3-i) for i in range(4)]
+        ]
+        
+        for condition in winning_conditions:
+            if all(self.board[row][col] == player for row, col in condition):
+                return True
+        return False
+    
+    def new_game(self):
+        """Reset the game for a new match.
+        
+        Actions performed:
+        - Clears the board (sets all cells to 0)
+        - Sets white player as active
+        - Disables orbit button
+        - Resets board display
+        - Updates active player label
+        """
+        self.board = [[0 for _ in range(4)] for _ in range(4)]
+        self.current_player = 1
+        self.move_made = False
+        self.orbit_button['state'] = 'disabled'
+        self.player_label.config(text="Tour du joueur Blanc")
+        self.update_display()
+    
+    def run(self):
+        """Start the game.
+        
+        Launches the main tkinter event loop.
+        Game remains active until window is closed.
+        """
+        self.window.mainloop()
+
+def game():
+    """Launch a new game of Orbit.
+    
+    Creates an instance of the OrbitGame class and starts the game.
+    This function is the main entry point of the program.
+    """
+    game = OrbitGame()
+    game.run()
+
+if __name__ == "__main__":
+    game()

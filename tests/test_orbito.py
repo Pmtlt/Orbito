@@ -93,11 +93,3 @@ def test_is_oponent_ball_black_false_empty():
         assert Orbito.is_valid_move("Noir", 0, 0, board) == False
     except AssertionError:
         pass
-
-#is_valid_oponent_ball_move:
-def is_valid_oponent_ball_move_white_():
-    try:
-        board = [[2,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-        assert Orbito.is_valid_oponent_ball_move("Blanc", 0, 1, 0, 0, board) == True
-    except AssertionError:
-        print("non")
