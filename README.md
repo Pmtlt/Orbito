@@ -25,11 +25,6 @@ Orbito is a strategic board game where two players compete to align 4 balls of t
 
 ## Installation
 
-### From PyPI
-```console
-pip install orbito
-```
-
 ### From Source 
 ```console
 git clone https://github.com/yourusername/orbito.git
@@ -42,10 +37,7 @@ Download the latest release from the releases page and run `Orbito.exe`.
 
 ## Usage
 
-To start the game:
-```console 
-python -m orbito
-```
+To start the game double clic on the .exe file `\orbito\release\Orbito.exe`  
 
 ## Game Rules
 
