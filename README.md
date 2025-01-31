@@ -61,11 +61,11 @@ python -m orbito
 
 ## AI Features
 
-- Three difficulty levels: easy, medium, hard
-- Smart move evaluation considering:
- - Potential winning moves
- - Center control
- - Multiple ball alignments
+- Basic AI opponent
+- Move evaluation considering:
+  - Potential winning moves
+  - Center control
+  - Multiple ball alignments
 - Automatic moves and rotation
 
 ## Development
