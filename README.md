@@ -1,6 +1,3 @@
-#[![PyPI - Version](https://img.shields.io/pypi/v/orbito.svg)](https://pypi.org/project/orbito)
-#[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/orbito.svg)](https://pypi.org/project/orbito)
-
 -----
 
 **Table of Contents**
