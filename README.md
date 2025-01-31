@@ -1,3 +1,7 @@
+\[![PyPI - Version](https://img.shields.io/pypi/v/orbito.svg)](https://pypi.org/project/orbito)
+\[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/orbito.svg)](https://pypi.org/project/orbito)
+
+
 -----
 
 **Table of Contents**
@@ -26,16 +30,16 @@ Orbito is a strategic board game where two players compete to align 4 balls of t
 ## Installation
 
 ### From PyPI
-\```console
+```console
 pip install orbito
-\```
+```
 
 ### From Source 
-\```console
+```console
 git clone https://github.com/yourusername/orbito.git
 cd orbito
 pip install -e .
-\```
+```
 
 ### Windows Executable
 Download the latest release from the releases page and run `Orbito.exe`.
@@ -43,9 +47,9 @@ Download the latest release from the releases page and run `Orbito.exe`.
 ## Usage
 
 To start the game:
-\```console 
+```console 
 python -m orbito
-\```
+```
 
 ## Game Rules
 
@@ -68,15 +72,15 @@ python -m orbito
 ## Development
 
 ### Running Tests
-\```console
+```console
 pip install -e ".[dev]"
 pytest
-\```
+```
 
 ### Building the Executable
-\```console
+```console
 python scripts/build_exe.py build
-\```
+```
 
 ## License
 
